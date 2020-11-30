@@ -2,19 +2,28 @@
 
 [Clique aqui](https://github.com/hashlab/hiring/blob/master/challenges/pt-br/sre-challenge.md) para acessar o desafio.
 
+## Projetos:
+
+- [terraform-google-cloud-network](https://github.com/letsrockthefuture/terraform-google-cloud-network): Responsável por provisionar a infraestrutura de rede no Google Cloud para o nosso Kubernetes Engine cluster;
+- [terraform-google-kubernetes-engine](https://github.com/letsrockthefuture/terraform-google-cloud-kubernetes-engine): Responsável por criar nosso Kubernetes Engine cluster e os node pools para nossas aplicações;
+- [Monolith](https://github.com/letsrockthefuture/monolith): Aplicação que será dividida em dois microserviços independentes, Cart e Checkout;
+- [Cart](https://github.com/letsrockthefuture/cart): Microserviço reponsável pelo carrinho de compras;
+- [Checkout](https://github.com/letsrockthefuture/checkout) Microserviço reponsável por finalizar a compra.
+
 ## Premissas:
 
 - Abordaremos o canary deployment para realizar o rollout transparente das aplicações, e para isso, utilizamos o Istio como gerenciador da implantação;
 - Front-end já está desacoplado do Monolith;
-- Outros microserviços que compõe a aplicação completa já são contenerizados e executados no Kubernetes e configurados com Istio;
+- Demais microserviços que compõe a aplicação completa já são contenerizados, executados no Kubernetes e configurados com Istio;
 - Alguns microserviços que dependem do Cart e Checkout serão atualizados no decorrer da migração, mais especificamente, os apontamentos para os services do Kubernetes;
 - Utilizamos infraestrutura como código com Terraform em projetos distintos entre infraestrutura e aplicação;
 - Utilizamos o conceito de GitOps para a implementação dos nossos projetos;
 - Fluxo contínuo de implementação com alguma suposta ferramenta de CI/CD e com pipeline configurada no próprio repositório do código, ativada via branch "main";
 - Organização e projeto criados no Google Cloud, e com billing account ativo;
-- Cloud Resource Manager API e Container API habilitados;
-- Database unica para o servico monolith;
-- Quebramos o Cart e Checkout em dois microserviços independentes.
+- Cloud Resource Manager API e Container API habilitados na Cloud;
+- Database única para o serviço monolith;
+- Quebramos o Cart e Checkout em dois microserviços independentes;
+- Não abordaremos a migração dos dados nos projetos.
 
 ## Tecnologias utilizadas:
 
@@ -26,34 +35,19 @@
 
 ## Extraindo os microserviços:
 
-1. Identificamos os módulos e dependências do microserviço que nós quebramos, tal como comunicação entre os demais serviços, e tabelas/estrutura de banco de dados;
+1. Identificamos os módulos e dependências da funcionalidade de /cart dentro do Monolith, tal como comunicação entre os demais serviços, e tabelas/estrutura de banco de dados;
 
-2. Selecionamos a primeira função chamada Cart para quebrarmos a partir do  Monolith, com isso, criamos um novo projeto no GitHub e refatoramos a funcionalidade para adaptar-se à nova estrutura. Assim, temos um novo microserviço e um banco de dados desacoplado e pronto para receber requisições dos demais serviços e lembrando que será necessário refatorar os demais serviços que consomem o Cart para o novo endpoint de sua API.
+2. Criamos um novo projeto no GitHub com o código da nova funcionalidade de /cart (API) e refatoramos para uma nova versão do Monolith para adaptar-se à nova estrutura. Assim, temos um novo microserviço utilizando um banco de dados desacoplado da infraestrutura do Monolith e pronto para receber requisição dos demais serviços, lembrando que será necessário refatorarmos os demais serviços que consomem o atual Monolith para apontarem para a nova API;
 
-3.
+3. Com as novas versões atualizadas e no ar, realizamos o rollout do tipo canary, configurando o Istio para realizar o traffic shifting de 95% para o Monolith e 5% para o novo microserviço que passa a lidar com as requisições do /cart. A partir deste momento, desde que bem monitorado e sem impacto no funcionamento das aplicações, aumentamos o traffic shifting até chegar em 100% do direcionamento para o Cart;
 
-Etapa2 : Identifique os modulos que desejamos romper e identificar as tabelas do banco de dados.
-Monolith, que atende o /cart e o /checkout
-
-Etapa 2: Divida as tabelas que correspondem a esses modulos e envolva com um serviço
-	identificar quais tabelas são usadas pelo modulo cart e dividi-las em seu próprio serviço. O serviço agora é a única coisa que pode acessar suas tabelas, implemente o microservico que cria uma API para que os outros serviços possam consumir os dados do cart e atualize os serviços foo e bar que chamavam o monolith/cart para V2, chamando a API do cart (novo microservico).
-
-Atualize o código que antes dependia das tabelas do banco de dados diretamente para chamar este novo serviço
-Enxague e repita
-
-## Projetos:
-
-- [terraform-google-cloud-network](https://github.com/letsrockthefuture/terraform-google-cloud-network): Responsável por provisionar a infraestrutura de rede no Google Cloud para o nosso Kubernetes Engine cluster.
-- [terraform-google-kubernetes-engine](https://github.com/letsrockthefuture/terraform-google-cloud-kubernetes-engine): Responsável por criar nosso Kubernetes Engine cluster e os node pools para nossas aplicações.
-- [Monolith](https://github.com/letsrockthefuture/monolith): Aplicação que será dividida em dois microserviços independentes, Cart e Checkout.
-- [Cart](https://github.com/letsrockthefuture/cart): Microserviço reponsável pelo carrinho de compras.
-- [Checkout](https://github.com/letsrockthefuture/checkout) Microserviço reponsável por finalizar a compra.
-
-### Rollout canary para o microserviço Cart:
+#### Rollout canary para o microserviço Cart:
 
 ![alt text](images/cart_canary.png)
 
-### Rollout canary para o microserviço Checkout:
+4. Repetimos o esforço para o microserviço de Checkout.
+
+#### Rollout canary para o microserviço Checkout:
 
 ![alt text](images/cart_canary.png)
 
