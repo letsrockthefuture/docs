@@ -53,13 +53,9 @@ Enxague e repita
 
 ![alt text](images/cart_canary.png)
 
----
-
 ### Rollout canary para o microserviço Checkout:
 
 ![alt text](images/cart_canary.png)
-
----
 
 ## Referências:
 
