@@ -25,7 +25,7 @@
 - Quebramos o Cart e Checkout em dois microserviços independentes;
 - Não abordaremos a migração dos dados nos projetos.
 
-## Tecnologias utilizadas:
+## Tecnologias usadas:
 
 - Terraform;
 - Google Cloud;
@@ -50,6 +50,10 @@
 #### Rollout canary para o microserviço Checkout:
 
 ![alt text](images/cart_canary.png)
+
+## Demonstracão do traffic shifting entre as aplicações:
+
+[![asciicast](https://asciinema.org/a/376345.svg)](https://asciinema.org/a/376345)
 
 ## Referências:
 
