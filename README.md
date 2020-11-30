@@ -10,7 +10,7 @@
 - [Cart](https://github.com/letsrockthefuture/cart): Microserviço reponsável pelo carrinho de compras;
 - [Checkout](https://github.com/letsrockthefuture/checkout) Microserviço reponsável por finalizar a compra.
 
-## Premissas:
+## Considerações:
 
 - Abordaremos o canary deployment para realizar o rollout transparente das aplicações, e para isso, utilizamos o Istio como gerenciador da implantação;
 - Front-end já está desacoplado do Monolith;
